@@ -1,5 +1,5 @@
 {
-  "name": "be-twitchshares",
+  "name": "twitch-shares-backend",
   "version": "0.1.0",
   "description": "Twitch Shares backend",
   "main": "listen.js",
