@@ -23,7 +23,7 @@ async function updateGameValues() {
     console.log(topGames);
     const {data: gameData, error: upsertError} = await supabase
         .from("games")
-        .upsert(topGames.filter(game => game.value >= 100).map(game => {
+        .upsert(topGames.filter(game => game.viewer_count >= 100).map(game => {
             return {
                 game_id: game.id,
                 game_name: game.name,
