@@ -1,0 +1,21 @@
+{
+  "name": "be-twitchshares",
+  "version": "0.1.0",
+  "description": "Twitch Shares backend",
+  "main": "listen.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node listen.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-extended": "^4.0.2",
+    "supertest": "^6.3.3"
+  }
+}

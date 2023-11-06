@@ -1,0 +1,15 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Twitch Shares backend API",
+    "description": "API for the backend project Twitch Shares",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": ""
+    }
+  ],
+  "paths": {
+  }
+}
