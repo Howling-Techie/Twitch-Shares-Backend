@@ -16,9 +16,6 @@ async function updateGameValues() {
     const updateTime = new Date();
     const nextUpdate = new Date();
     nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
-
-    await createValueCheckpoint();
-    await createPortfolioCheckpoint();
     const topGames = await getTopGames();
     console.log(topGames);
     const {data: gameData, error: upsertError} = await supabase
@@ -40,6 +37,9 @@ async function updateGameValues() {
         .lte("last_updated", updateTime.toISOString())
         .neq("value", 50)
         .select();
+
+    await createValueCheckpoint();
+    await createPortfolioCheckpoint();
 
     const {error: insertError} = await supabase
         .from("stats")
