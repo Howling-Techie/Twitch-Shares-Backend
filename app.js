@@ -4,9 +4,11 @@ const app = express();
 const apiRouter = require("./routes/api.router");
 const path = require("path");
 const cors = require("cors");
-
 const {updateGameValues} = require("./supabase");
+const {createServer} = require("http");
+const {Server} = require("socket.io");
 
+const httpServer = createServer(app);
 app.use(express.json());
 app.use(cors());
 
@@ -24,12 +26,13 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
 
-    if (minutes % 15 === 0) {
+    if (minutes % 1 === 0) {
         await updateGameValues();
     }
 }
 
 // Set interval to check for updates
 setInterval(updateAtIntervals, 60 * 1000); // Check every minute
+
 
 module.exports = app;
