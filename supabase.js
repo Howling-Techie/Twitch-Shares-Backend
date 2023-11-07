@@ -15,9 +15,9 @@ async function createValueCheckpoint() {
 async function updateGameValues() {
     const updateTime = new Date();
     const nextUpdate = new Date();
-    nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
+    nextUpdate.setMinutes(nextUpdate.getMinutes() + 1);
     const topGames = await getTopGames();
-    console.log(topGames);
+
     const {data: gameData, error: upsertError} = await supabase
         .from("games")
         .upsert(topGames.filter(game => game.viewer_count >= 100).map(game => {
@@ -47,8 +47,13 @@ async function updateGameValues() {
             updated_at: updateTime.toISOString(),
             next_update: nextUpdate.toISOString(),
             games_updated: gameData.length,
-            games_dropped_out: updateData.length
+            games_dropped_out: updateData.length,
+            update_type: "values update"
         });
+}
+
+async function startNewRound() {
+    await supabase.rpc("start_new_round");
 }
 
 module.exports = {updateGameValues};
