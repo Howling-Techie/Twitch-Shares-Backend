@@ -71,7 +71,6 @@ function getGames(token, after) {
 
 async function getTopGames() {
     const token = await getToken();
-    console.log("Getting streams");
     const streamResponse = await getStreams(token);
     const streams = streamResponse.data;
     let pageCount = 0;
@@ -112,9 +111,7 @@ async function getTopGames() {
     for (const gameID of topGameIDs) {
         const viewerCount = streams.filter(stream => stream.game_id === gameID).reduce((total, current) => total + current.viewer_count, 0);
         const game = games.find(game => game.id === gameID);
-        if (game === undefined) {
-            console.log(gameID);
-        } else {
+        if (game !== undefined) {
             topGames.push({id: game.id, name: game.name, box_art: game.box_art_url, viewer_count: viewerCount});
         }
     }
