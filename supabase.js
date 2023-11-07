@@ -12,6 +12,10 @@ async function createValueCheckpoint() {
     await supabase.rpc("update_price_history");
 }
 
+async function cleanHistories() {
+    await supabase.rpc("clean_histories");
+}
+
 async function updateGameValues() {
     const updateTime = new Date();
     const nextUpdate = new Date();
@@ -40,6 +44,7 @@ async function updateGameValues() {
 
     await createValueCheckpoint();
     await createPortfolioCheckpoint();
+    await cleanHistories();
 
     const {error: insertError} = await supabase
         .from("stats")
