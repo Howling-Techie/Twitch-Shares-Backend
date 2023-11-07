@@ -6,7 +6,6 @@ const path = require("path");
 const cors = require("cors");
 const {updateGameValues} = require("./supabase");
 const {createServer} = require("http");
-const {Server} = require("socket.io");
 
 const httpServer = createServer(app);
 app.use(express.json());
