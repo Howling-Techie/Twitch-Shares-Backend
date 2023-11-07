@@ -25,13 +25,18 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
 
-    if (minutes % 1 === 0) {
+    if (minutes % 15 === 0) {
         await updateGameValues();
     }
 }
 
-// Set interval to check for updates
-setInterval(updateAtIntervals, 60 * 1000); // Check every minute
+let updateIntervalID = undefined;
 
+function startUpdateInterval() {
+// Set interval to check for updates
+    updateIntervalID = setInterval(updateAtIntervals, 60 * 1000); // Check every minute
+}
+
+startUpdateInterval();
 
 module.exports = app;
