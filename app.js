@@ -4,7 +4,17 @@ const app = express();
 const apiRouter = require("./routes/api.router");
 const path = require("path");
 const cors = require("cors");
+const {createServer} = require("http");
+const {Server} = require("socket.io");
 
+const httpServer = createServer(app);
+const io = new Server(httpServer, { /* options */});
+
+io.on("connection", (socket) => {
+
+});
+
+httpServer.listen(3000);
 const {updateGameValues} = require("./supabase");
 
 app.use(express.json());
