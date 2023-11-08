@@ -4,8 +4,9 @@ const app = express();
 const apiRouter = require("./routes/api.router");
 const path = require("path");
 const cors = require("cors");
-const {updateGameValues} = require("./supabase");
+const {updateGameValues, updateGameInfo} = require("./supabase");
 const {createServer} = require("http");
+const {getGameDescription} = require("./twitch");
 
 const httpServer = createServer(app);
 app.use(express.json());
@@ -30,13 +31,22 @@ async function updateAtIntervals() {
     }
 }
 
-let updateIntervalID = undefined;
-
 function startUpdateInterval() {
 // Set interval to check for updates
-    updateIntervalID = setInterval(updateAtIntervals, 60 * 1000); // Check every minute
+    setInterval(updateAtIntervals, 60 * 1000); // Check every minute
 }
 
+function startUpdateGameInfoAtInterval() {
+// Set interval to check for updates
+    setInterval(updateGameInfoAtInterval, 60 * 1000); // Check every minute
+}
+
+async function updateGameInfoAtInterval() {
+    updateGameInfo();
+}
+
+//updateAtIntervals();
+startUpdateGameInfoAtInterval();
 startUpdateInterval();
 
 module.exports = app;
