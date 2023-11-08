@@ -1,8 +1,13 @@
 require("dotenv").config();
 const axios = require("axios");
 
+let storedToken = {};
+let tokenExpiration = new Date();
 
 function getToken() {
+    if (tokenExpiration > new Date()) {
+        return storedToken;
+    }
     const twitchClientId = process.env.TWITCH_CLIENT_ID;
     const twitchClientSecret = process.env.TWITCH_CLIENT_SECRET;
 
@@ -12,7 +17,7 @@ function getToken() {
     data.append("client_secret", twitchClientSecret);
     data.append("grant_type", "client_credentials");
 
-    return axios.post(url, data, {
+    storedToken = axios.post(url, data, {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
@@ -21,6 +26,9 @@ function getToken() {
         .catch(error => {
             throw new Error(`Error fetching token: ${error}`);
         });
+    tokenExpiration = new Date();
+    tokenExpiration.setSeconds(tokenExpiration.getSeconds() + storedToken.expires_in - 60);
+    return storedToken;
 }
 
 function getStreams(token, after) {
@@ -112,12 +120,38 @@ async function getTopGames() {
         const viewerCount = streams.filter(stream => stream.game_id === gameID).reduce((total, current) => total + current.viewer_count, 0);
         const game = games.find(game => game.id === gameID);
         if (game !== undefined) {
-            topGames.push({id: game.id, name: game.name, box_art: game.box_art_url, viewer_count: viewerCount});
+            topGames.push({
+                id: game.id,
+                name: game.name,
+                box_art: game.box_art_url,
+                viewer_count: viewerCount,
+                igdb_id: game.igdb_id
+            });
         }
     }
     return topGames.sort((a, b) => b.viewer_count - a.viewer_count);
 }
 
+async function getGameDescription(game_id) {
+    const twitchClientId = process.env.TWITCH_CLIENT_ID;
+    const url = "https://api.igdb.com/v4/games";
+
+    const tokenToUse = await getToken();
+    const headers = {
+        "Client-ID": twitchClientId,
+        "Authorization": `Bearer ${tokenToUse.access_token}`,
+        "Accept": "application/json",
+    };
+    const data = `fields summary; where id = ${game_id};`;
+    
+    return axios.post(url, data, {headers})
+        .then(response => response.data)
+        .catch(error => {
+            throw new Error(`Error fetching games: ${error}`);
+        });
+}
+
 module.exports = {
-    getTopGames
+    getTopGames,
+    getGameDescription
 };
