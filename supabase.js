@@ -37,9 +37,8 @@ async function updateGameValues() {
         .select();
     const {data: updateData, error: updateError} = await supabase
         .from("games")
-        .update({value: 0})
+        .update({value: 0, last_updated: (new Date()).toISOString()})
         .lte("last_updated", updateTime.toISOString())
-        .neq("value", 50)
         .neq("value", 0)
         .select();
 
