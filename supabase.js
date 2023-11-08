@@ -66,7 +66,7 @@ async function updateGameInfo() {
         .order("value", {ascending: false})
         .limit(1)
         .maybeSingle();
-    if (game === undefined) {
+    if (game === undefined || game === null) {
         return;
     }
     const info = await getGameDescription(game.igdb_id);
