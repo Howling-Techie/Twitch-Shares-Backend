@@ -66,6 +66,9 @@ async function updateGameInfo() {
         .order("value", {ascending: false})
         .limit(1)
         .maybeSingle();
+    if (game === undefined) {
+        return;
+    }
     const info = await getGameDescription(game.igdb_id);
 
     const {data: gameData, error: upsertError} = await supabase
