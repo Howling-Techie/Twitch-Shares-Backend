@@ -57,8 +57,17 @@ async function updateGameValues() {
         });
 }
 
+async function getGames() {
+    const {data, error} = await supabase
+        .from("games")
+        .select()
+        .order("value", {ascending: false})
+        .limit(10);
+    return data;
+}
+
 async function startNewRound() {
     await supabase.rpc("start_new_round");
 }
 
-module.exports = {updateGameValues};
+module.exports = {updateGameValues, getGames};
