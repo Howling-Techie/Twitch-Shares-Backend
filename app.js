@@ -25,7 +25,7 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
 
-    if (minutes % 1 === 0) {
+    if (minutes % 15 === 0) {
         await updateGameValues();
     }
 }

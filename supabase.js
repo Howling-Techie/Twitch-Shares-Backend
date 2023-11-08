@@ -37,9 +37,10 @@ async function updateGameValues() {
 
     const {data: updateData, error: updateError} = await supabase
         .from("games")
-        .update({value: 50})
+        .update({value: 0})
         .lte("last_updated", updateTime.toISOString())
         .neq("value", 50)
+        .neq("value", 0)
         .select();
 
     await createValueCheckpoint();
