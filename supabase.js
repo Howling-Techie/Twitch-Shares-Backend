@@ -16,7 +16,7 @@ async function cleanHistories() {
     await supabase.rpc("clean_histories");
 }
 
-async function updateGameValues() {
+async function updateGameValues(usersToUpdate, updateCallback) {
     const updateTime = new Date();
     const nextUpdate = new Date();
     nextUpdate.setMinutes(nextUpdate.getMinutes() + 1);
@@ -45,6 +45,19 @@ async function updateGameValues() {
     await createValueCheckpoint();
     await createPortfolioCheckpoint();
     await cleanHistories();
+
+    for (const userToUpdate of usersToUpdate) {
+        const {data: shareData} = await supabase
+            .from("shares")
+            .select()
+            .eq("user_id", userToUpdate);
+        for (const shareDatum of shareData) {
+            const games = topGames.filter(game => game.game_id === shareDatum.game_id);
+            if (games.length === 1) {
+                updateCallback(userToUpdate, games[0]);
+            }
+        }
+    }
 
     const {error: insertError} = await supabase
         .from("stats")
