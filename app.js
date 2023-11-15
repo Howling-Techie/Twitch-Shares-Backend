@@ -23,6 +23,7 @@ io.on("connection", (socket) => {
     socket.join("updates");
     socket.join("resets");
     socket.on("register user", (user_id) => {
+        console.log(`Registering ${user_id}`);
         socket.join(user_id);
         users.push({user_id, socket_id: socket.id});
     });
