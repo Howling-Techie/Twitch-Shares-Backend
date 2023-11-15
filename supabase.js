@@ -47,10 +47,12 @@ async function updateGameValues(usersToUpdate, updateCallback) {
     // await cleanHistories();
 
     for (const userToUpdate of usersToUpdate) {
+        console.log(`Updating ${userToUpdate}`);
         const {data: shareData} = await supabase
             .from("shares")
             .select()
             .eq("user_id", userToUpdate);
+        console.log(JSON.stringify(shareData));
         if (shareData) {
             for (let i = 0; i < shareData.length; i++) {
                 const games = topGames.filter(game => +game.id === shareData[i].game_id);
