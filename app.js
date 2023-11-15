@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(3000);
+httpServer.listen(10000);
 
 async function updateUsers(nextUpdate) {
     const topGames = await getGames();
