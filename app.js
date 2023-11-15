@@ -84,5 +84,7 @@ function startUpdateInterval() {
 
 function startUpdateGameInfoAtInterval() {
 // Set interval to check for updates
-setInterval(updateAtIntervals, 10 * 1000); // Check every ten seconds
+    setInterval(updateAtIntervals, 10 * 1000); // Check every ten seconds
+}
+
 module.exports = app;
