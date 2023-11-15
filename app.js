@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(10000);
+//httpServer.listen(10000);
 
 async function updateUsers(nextUpdate) {
     const topGames = await getGames();
@@ -87,4 +87,4 @@ function startUpdateGameInfoAtInterval() {
     setInterval(updateAtIntervals, 10 * 1000); // Check every ten seconds
 }
 
-module.exports = app;
+module.exports = httpServer;
