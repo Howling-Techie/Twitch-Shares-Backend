@@ -19,26 +19,12 @@ const io = new Server(httpServer, {
 });
 const users = [];
 io.on("connection", (socket) => {
-    console.log("New Inbound Connection");
+
     socket.join("updates");
     socket.join("resets");
     socket.on("register user", (user_id) => {
-        console.log(`Registering user ${user_id}`);
         socket.join(user_id);
         users.push(user_id);
-        const now = new Date();
-        const currentMinute = now.getMinutes();
-
-        // Calculate the start of the current 15-minute interval
-        const startInterval = new Date(now);
-        startInterval.setMinutes(currentMinute - (currentMinute % 15), 0, 0);
-
-        // Calculate the end of the current 15-minute interval
-        const endInterval = new Date(startInterval);
-        endInterval.setMinutes(startInterval.getMinutes() + 15);
-        getGames().then((topGames) => {
-            socket.emit("update", {times: {updateTime: startInterval, nextUpdate: endInterval}, games: topGames});
-        });
     });
 });
 
@@ -46,13 +32,11 @@ io.on("connection", (socket) => {
 
 async function updateUsers(nextUpdate) {
     const topGames = await getGames();
-    console.log("Updating Users");
     io.to("updates").emit("update", {times: {updateTime: Date.now(), nextUpdate}, games: topGames});
 }
 
 function updateUser(user_id, game) {
     io.to(user_id).emit("game_update", {game});
-    console.log("Sending game update to " + user_id);
 }
 
 app.use("/api", apiRouter);
@@ -69,7 +53,7 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    if (minutes % 1 === 0) {
+    if (minutes % 15 === 0) {
         await updateGameValues(users, updateUser);
         const nextUpdate = new Date();
         nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
