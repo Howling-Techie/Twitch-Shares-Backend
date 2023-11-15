@@ -25,7 +25,11 @@ io.on("connection", (socket) => {
     socket.on("register user", (user_id) => {
         console.log(`Registering ${user_id}`);
         socket.join(user_id);
-        users.push({user_id, socket_id: socket.id});
+        const index = users.findIndex(obj => obj.socket_id === socket.id);
+
+        if (index === -1) {
+            users.push({user_id, socket_id: socket.id});
+        }
     });
     socket.on("disconnecting", (reason) => {
         socket.leave("updates");
@@ -64,7 +68,7 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    if (minutes % 1 === 0) {
+    if (minutes % 15 === 0) {
         console.log(JSON.stringify(users));
         await updateGameValues(users.map(user => user.user_id), updateUser);
         const nextUpdate = new Date();
