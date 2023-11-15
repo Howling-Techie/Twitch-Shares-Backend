@@ -45,6 +45,7 @@ async function updateUsers(nextUpdate) {
 }
 
 function updateUser(user_id, game) {
+    console.log(`Sending game update to ${user_id}`);
     io.to(user_id).emit("game_update", {game});
 }
 
@@ -62,7 +63,7 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    if (minutes % 15 === 0) {
+    if (minutes % 1 === 0) {
         await updateGameValues(users.map(user => user.user_id), updateUser);
         const nextUpdate = new Date();
         nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
