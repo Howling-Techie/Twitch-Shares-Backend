@@ -13,7 +13,7 @@ const {updateGameValues, getGames} = require("./supabase");
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:8081",
+        origin: "http://localhost:10000",
         methods: ["GET", "POST"]
     }
 });
