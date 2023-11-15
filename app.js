@@ -20,17 +20,12 @@ const io = new Server(httpServer, {
 const users = [];
 io.on("connection", (socket) => {
     console.log("New Inbound Connection");
+    socket.join("updates");
+    socket.join("resets");
     socket.on("register user", (user_id) => {
-        console.log(`User ${user_id} connected`);
-        socket.leave(user_id);
-        socket.leave("updates");
-        socket.leave("resets");
+        console.log(`Registering user ${user_id}`);
         socket.join(user_id);
-        socket.join("updates");
-        socket.join("resets");
-        if (!(user_id in users)) {
-            users.push(user_id);
-        }
+        users.push(user_id);
         const now = new Date();
         const currentMinute = now.getMinutes();
 
@@ -51,11 +46,13 @@ httpServer.listen(3000);
 
 async function updateUsers(nextUpdate) {
     const topGames = await getGames();
+    console.log("Updating Users");
     io.to("updates").emit("update", {times: {updateTime: Date.now(), nextUpdate}, games: topGames});
 }
 
 function updateUser(user_id, game) {
     io.to(user_id).emit("game_update", {game});
+    console.log("Sending game update to " + user_id);
 }
 
 app.use("/api", apiRouter);
@@ -71,8 +68,8 @@ app.use((err, req, res, next) => {
 async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
-
-    if (minutes % 15 === 0) {
+    const seconds = now.getSeconds();
+    if (minutes % 15 === 0 && seconds < 10) {
         await updateGameValues(users, updateUser);
         const nextUpdate = new Date();
         nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
@@ -81,5 +78,5 @@ async function updateAtIntervals() {
 }
 
 // Set interval to check for updates
-setInterval(updateAtIntervals, 60 * 1000); // Check every minute
+setInterval(updateAtIntervals, 10 * 1000); // Check every ten seconds
 module.exports = app;
