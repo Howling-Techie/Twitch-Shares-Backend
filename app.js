@@ -77,6 +77,12 @@ async function updateAtIntervals() {
     }
 }
 
+function startUpdateInterval() {
+// Set interval to check for updates
+    setInterval(updateAtIntervals, 60 * 1000); // Check every minute
+}
+
+function startUpdateGameInfoAtInterval() {
 // Set interval to check for updates
 setInterval(updateAtIntervals, 10 * 1000); // Check every ten seconds
 module.exports = app;

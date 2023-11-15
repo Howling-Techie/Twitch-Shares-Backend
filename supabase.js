@@ -1,5 +1,5 @@
 const {createClient} = require("@supabase/supabase-js");
-const {getTopGames} = require("./twitch");
+const {getTopGames, getGameDescription} = require("./twitch");
 require("dotenv").config();
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SERVICE_KEY);
@@ -80,6 +80,30 @@ async function getGames() {
         .limit(10);
     return data;
 }
+
+async function updateGameInfo() {
+    const {data: game} = await supabase
+        .from("games")
+        .select("game_id, game_name, description, value, igdb_id")
+        .gt("igdb_id", 0)
+        .is("description", null)
+        .order("value", {ascending: false})
+        .limit(1)
+        .maybeSingle();
+    if (game === undefined || game === null) {
+        return;
+    }
+    const info = await getGameDescription(game.igdb_id);
+
+    const {data: gameData, error: upsertError} = await supabase
+        .from("games")
+        .update({
+            description: info[0].summary ?? "N/A"
+        })
+        .eq("game_id", +game.game_id)
+        .select();
+}
+
 
 async function startNewRound() {
     await supabase.rpc("start_new_round");
