@@ -69,7 +69,7 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    if (minutes % 15 === 0 && seconds < 10) {
+    if (minutes % 1 === 0) {
         await updateGameValues(users, updateUser);
         const nextUpdate = new Date();
         nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
@@ -82,9 +82,6 @@ function startUpdateInterval() {
     setInterval(updateAtIntervals, 60 * 1000); // Check every minute
 }
 
-function startUpdateGameInfoAtInterval() {
-// Set interval to check for updates
-    setInterval(updateAtIntervals, 10 * 1000); // Check every ten seconds
-}
+startUpdateInterval();
 
 module.exports = httpServer;
