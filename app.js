@@ -68,7 +68,7 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    if (minutes % 15 === 0) {
+    if (minutes % 1 === 0 && seconds < 10) {
         console.log(JSON.stringify(users));
         await updateGameValues(users.map(user => user.user_id), updateUser);
         const nextUpdate = new Date();
@@ -79,7 +79,7 @@ async function updateAtIntervals() {
 
 function startUpdateInterval() {
 // Set interval to check for updates
-    setInterval(updateAtIntervals, 60 * 1000); // Check every minute
+    setInterval(updateAtIntervals, 10 * 1000); // Check ten seconds minute
 }
 
 startUpdateInterval();
