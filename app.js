@@ -68,7 +68,7 @@ async function updateAtIntervals() {
     const now = new Date();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    if (minutes % 1 === 0 && seconds >= 10 && seconds < 20) {
+    if (minutes % 15 === 0 && seconds >= 10 && seconds < 20) {
         await updateGameValues(users.map(user => user.user_id), updateUser);
         const nextUpdate = new Date();
         nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
