@@ -22,37 +22,35 @@ async function updateGameValues(usersToUpdate, updateCallback) {
     nextUpdate.setMinutes(nextUpdate.getMinutes() + 1);
     const topGames = await getTopGames();
 
-    // const {data: gameData, error: upsertError} = await supabase
-    //     .from("games")
-    //     .upsert(topGames.filter(game => game.viewer_count >= 100).map(game => {
-    //         return {
-    //             game_id: game.id,
-    //             game_name: game.name,
-    //             cover_url: game.box_art,
-    //             value: game.viewer_count,
-    //             last_updated: (new Date()).toISOString()
-    //         };
-    //     }))
-    //     .select();
-    //
-    // const {data: updateData, error: updateError} = await supabase
-    //     .from("games")
-    //     .update({value: 50})
-    //     .lte("last_updated", updateTime.toISOString())
-    //     .neq("value", 50)
-    //     .select();
-    //
-    // await createValueCheckpoint();
-    // await createPortfolioCheckpoint();
-    // await cleanHistories();
+    const {data: gameData} = await supabase
+        .from("games")
+        .upsert(topGames.filter(game => game.viewer_count >= 100).map(game => {
+            return {
+                game_id: game.id,
+                game_name: game.name,
+                cover_url: game.box_art,
+                value: game.viewer_count,
+                last_updated: (new Date()).toISOString()
+            };
+        }))
+        .select();
+
+    const {data: updateData} = await supabase
+        .from("games")
+        .update({value: 50})
+        .lte("last_updated", updateTime.toISOString())
+        .neq("value", 50)
+        .select();
+
+    await createValueCheckpoint();
+    await createPortfolioCheckpoint();
+    await cleanHistories();
 
     for (const userToUpdate of usersToUpdate) {
-        console.log(`Updating ${userToUpdate}`);
         const {data: shareData} = await supabase
             .from("shares")
             .select()
             .eq("user_id", userToUpdate);
-        console.log(JSON.stringify(shareData));
         if (shareData) {
             for (let i = 0; i < shareData.length; i++) {
                 const games = topGames.filter(game => +game.id === shareData[i].game_id);
@@ -63,19 +61,19 @@ async function updateGameValues(usersToUpdate, updateCallback) {
         }
     }
 
-    // const {error: insertError} = await supabase
-    //     .from("stats")
-    //     .insert({
-    //         updated_at: updateTime.toISOString(),
-    //         next_update: nextUpdate.toISOString(),
-    //         games_updated: gameData.length,
-    //         games_dropped_out: updateData.length,
-    //         update_type: "values update"
-    //     });
+    await supabase
+        .from("stats")
+        .insert({
+            updated_at: updateTime.toISOString(),
+            next_update: nextUpdate.toISOString(),
+            games_updated: gameData.length,
+            games_dropped_out: updateData.length,
+            update_type: "values update"
+        });
 }
 
 async function getGames() {
-    const {data, error} = await supabase
+    const {data} = await supabase
         .from("games")
         .select()
         .order("value", {ascending: false})
@@ -97,13 +95,12 @@ async function updateGameInfo() {
     }
     const info = await getGameDescription(game.igdb_id);
 
-    const {data: gameData, error: upsertError} = await supabase
+    const {} = await supabase
         .from("games")
         .update({
             description: info[0].summary ?? "N/A"
         })
-        .eq("game_id", +game.game_id)
-        .select();
+        .eq("game_id", +game.game_id);
 }
 
 
@@ -111,4 +108,4 @@ async function startNewRound() {
     await supabase.rpc("start_new_round");
 }
 
-module.exports = {updateGameValues, getGames};
+module.exports = {updateGameValues, getGames, updateGameInfo, startNewRound};

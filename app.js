@@ -2,13 +2,12 @@ const express = require("express");
 
 const app = express();
 const apiRouter = require("./routes/api.router");
-const path = require("path");
 const cors = require("cors");
 const {createServer} = require("http");
 const {Server} = require("socket.io");
 app.use(express.json());
 app.use(cors());
-const {updateGameValues, getGames} = require("./supabase");
+const {updateGameValues, getGames, updateGameInfo, startNewRound} = require("./supabase");
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -23,7 +22,6 @@ io.on("connection", (socket) => {
     socket.join("updates");
     socket.join("resets");
     socket.on("register user", (user_id) => {
-        console.log(`Registering ${user_id}`);
         socket.join(user_id);
         const index = users.findIndex(obj => obj.socket_id === socket.id);
 
@@ -31,7 +29,7 @@ io.on("connection", (socket) => {
             users.push({user_id, socket_id: socket.id});
         }
     });
-    socket.on("disconnecting", (reason) => {
+    socket.on("disconnecting", () => {
         socket.leave("updates");
         socket.leave("resets");
         const index = users.findIndex(obj => obj.socket_id === socket.id);
@@ -42,7 +40,6 @@ io.on("connection", (socket) => {
     });
 });
 
-//httpServer.listen(10000);
 
 async function updateUsers(nextUpdate) {
     const topGames = await getGames();
@@ -50,7 +47,6 @@ async function updateUsers(nextUpdate) {
 }
 
 function updateUser(user_id, game) {
-    console.log(`Sending game update to ${user_id}`);
     io.to(user_id).emit("game_update", {game});
 }
 
@@ -66,9 +62,16 @@ app.use((err, req, res, next) => {
 
 async function updateAtIntervals() {
     const now = new Date();
+    const day = now.getDay();
+    const hours = now.getHours();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    if (minutes % 15 === 0 && seconds >= 10 && seconds < 20) {
+
+    if (day === 1 && hours === 0 && minutes === 0 && seconds < 10) {
+        await startNewRound();
+    }
+
+    if (minutes % 15 === 0 && seconds < 10) {
         await updateGameValues(users.map(user => user.user_id), updateUser);
         const nextUpdate = new Date();
         nextUpdate.setMinutes(nextUpdate.getMinutes() + 15);
@@ -76,9 +79,14 @@ async function updateAtIntervals() {
     }
 }
 
+async function updateGameInfoAtIntervals() {
+    await updateGameInfo();
+}
+
 function startUpdateInterval() {
 // Set interval to check for updates
-    setInterval(updateAtIntervals, 10 * 1000); // Check ten seconds
+    setInterval(updateAtIntervals, 10 * 1000); // Check every ten seconds
+    setInterval(updateGameInfoAtIntervals, 60 * 1000); // Check every minute
 }
 
 startUpdateInterval();
